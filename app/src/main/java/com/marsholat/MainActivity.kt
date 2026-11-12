@@ -5,25 +5,26 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.marsholat.core.model.ThemeMode
+import com.marsholat.core.notification.AlarmScheduler
 import com.marsholat.presentation.home.HomeScreen
 import com.marsholat.presentation.home.HomeViewModel
 import com.marsholat.presentation.navigation.MainNavigation
+import com.marsholat.presentation.notifications.NotificationSettingsScreen
+import com.marsholat.presentation.notifications.NotificationSettingsViewModel
 import com.marsholat.presentation.schedule.ScheduleScreen
 import com.marsholat.presentation.schedule.ScheduleViewModel
+import com.marsholat.presentation.settings.SettingsScreen
+import com.marsholat.presentation.settings.SettingsViewModel
 import com.marsholat.presentation.theme.ThemeViewModel
 import com.marsholat.presentation.tracker.TrackerScreen
 import com.marsholat.presentation.tracker.TrackerViewModel
 import com.marsholat.ui.theme.MarsholatTheme
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,6 +32,10 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         val app = application as MarSholatApplication
+
+        lifecycleScope.launch {
+            AlarmScheduler.scheduleAllAlarms(applicationContext)
+        }
 
         setContent {
             val themeViewModel: ThemeViewModel = viewModel {
@@ -69,6 +74,20 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
+                val settingsViewModel: SettingsViewModel = viewModel {
+                    SettingsViewModel(
+                        settingsRepository = app.settingsRepository,
+                        context = applicationContext
+                    )
+                }
+
+                val notificationSettingsViewModel: NotificationSettingsViewModel = viewModel {
+                    NotificationSettingsViewModel(
+                        settingsRepository = app.settingsRepository,
+                        context = applicationContext
+                    )
+                }
+
                 MainNavigation(
                     homeScreenContent = { toSettings, toSchedule, toTracker ->
                         HomeScreen(
@@ -84,24 +103,20 @@ class MainActivity : ComponentActivity() {
                     trackerScreenContent = {
                         TrackerScreen(viewModel = trackerViewModel)
                     },
-                    settingsScreenContent = { _ ->
-                        PlaceholderScreen("Settings (Fase 5)")
+                    settingsScreenContent = { toNotifSettings ->
+                        SettingsScreen(
+                            viewModel = settingsViewModel,
+                            onNavigateToNotificationSettings = toNotifSettings
+                        )
                     },
-                    notificationSettingsContent = { _ ->
-                        PlaceholderScreen("Notification Settings (Fase 5)")
+                    notificationSettingsContent = { onBack ->
+                        NotificationSettingsScreen(
+                            viewModel = notificationSettingsViewModel,
+                            onNavigateBack = onBack
+                        )
                     }
                 )
             }
         }
-    }
-}
-
-@Composable
-fun PlaceholderScreen(title: String) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = title)
     }
 }

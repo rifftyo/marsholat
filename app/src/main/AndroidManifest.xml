@@ -38,6 +38,31 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Foreground Service for Adzan Playback -->
+        <service
+            android:name=".core.notification.AdzanPlaybackService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
+
+        <!-- Broadcast Receivers -->
+        <receiver
+            android:name=".core.notification.PrayerAlarmReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".core.notification.SmartReminderReceiver"
+            android:exported="false" />
+
+        <receiver
+            android:name=".core.notification.BootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
