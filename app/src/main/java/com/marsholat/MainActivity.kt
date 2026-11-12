@@ -21,6 +21,8 @@ import com.marsholat.presentation.navigation.MainNavigation
 import com.marsholat.presentation.schedule.ScheduleScreen
 import com.marsholat.presentation.schedule.ScheduleViewModel
 import com.marsholat.presentation.theme.ThemeViewModel
+import com.marsholat.presentation.tracker.TrackerScreen
+import com.marsholat.presentation.tracker.TrackerViewModel
 import com.marsholat.ui.theme.MarsholatTheme
 
 class MainActivity : ComponentActivity() {
@@ -59,6 +61,14 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
+                val trackerViewModel: TrackerViewModel = viewModel {
+                    TrackerViewModel(
+                        trackerRepository = app.prayerTrackerRepository,
+                        scheduleRepository = app.prayerScheduleRepository,
+                        settingsRepository = app.settingsRepository
+                    )
+                }
+
                 MainNavigation(
                     homeScreenContent = { toSettings, toSchedule, toTracker ->
                         HomeScreen(
@@ -72,7 +82,7 @@ class MainActivity : ComponentActivity() {
                         ScheduleScreen(viewModel = scheduleViewModel)
                     },
                     trackerScreenContent = {
-                        PlaceholderScreen("Ibadah Tracker (Fase 4)")
+                        TrackerScreen(viewModel = trackerViewModel)
                     },
                     settingsScreenContent = { _ ->
                         PlaceholderScreen("Settings (Fase 5)")
