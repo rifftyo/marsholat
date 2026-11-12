@@ -15,7 +15,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.marsholat.core.model.ThemeMode
+import com.marsholat.presentation.home.HomeScreen
+import com.marsholat.presentation.home.HomeViewModel
 import com.marsholat.presentation.navigation.MainNavigation
+import com.marsholat.presentation.schedule.ScheduleScreen
+import com.marsholat.presentation.schedule.ScheduleViewModel
 import com.marsholat.presentation.theme.ThemeViewModel
 import com.marsholat.ui.theme.MarsholatTheme
 
@@ -39,12 +43,43 @@ class MainActivity : ComponentActivity() {
             }
 
             MarsholatTheme(darkTheme = isDark) {
+                val homeViewModel: HomeViewModel = viewModel {
+                    HomeViewModel(
+                        settingsRepository = app.settingsRepository,
+                        prayerScheduleRepository = app.prayerScheduleRepository,
+                        trackerRepository = app.prayerTrackerRepository,
+                        context = applicationContext
+                    )
+                }
+
+                val scheduleViewModel: ScheduleViewModel = viewModel {
+                    ScheduleViewModel(
+                        settingsRepository = app.settingsRepository,
+                        prayerScheduleRepository = app.prayerScheduleRepository
+                    )
+                }
+
                 MainNavigation(
-                    homeScreenContent = { _, _, _ -> PlaceholderScreen("MarSholat Home") },
-                    scheduleScreenContent = { PlaceholderScreen("Jadwal Shalat") },
-                    trackerScreenContent = { PlaceholderScreen("Ibadah Tracker") },
-                    settingsScreenContent = { _ -> PlaceholderScreen("Settings") },
-                    notificationSettingsContent = { _ -> PlaceholderScreen("Pengaturan Notifikasi") }
+                    homeScreenContent = { toSettings, toSchedule, toTracker ->
+                        HomeScreen(
+                            viewModel = homeViewModel,
+                            onNavigateToSettings = toSettings,
+                            onNavigateToSchedule = toSchedule,
+                            onNavigateToTracker = toTracker
+                        )
+                    },
+                    scheduleScreenContent = {
+                        ScheduleScreen(viewModel = scheduleViewModel)
+                    },
+                    trackerScreenContent = {
+                        PlaceholderScreen("Ibadah Tracker (Fase 4)")
+                    },
+                    settingsScreenContent = { _ ->
+                        PlaceholderScreen("Settings (Fase 5)")
+                    },
+                    notificationSettingsContent = { _ ->
+                        PlaceholderScreen("Notification Settings (Fase 5)")
+                    }
                 )
             }
         }

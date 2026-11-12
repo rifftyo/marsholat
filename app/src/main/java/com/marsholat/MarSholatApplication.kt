@@ -4,8 +4,10 @@ import android.app.Application
 import com.marsholat.data.local.MarSholatDatabase
 import com.marsholat.data.preferences.AppPreferencesManager
 import com.marsholat.data.repository.PrayerScheduleRepositoryImpl
+import com.marsholat.data.repository.PrayerTrackerRepositoryImpl
 import com.marsholat.data.repository.SettingsRepositoryImpl
 import com.marsholat.domain.repository.PrayerScheduleRepository
+import com.marsholat.domain.repository.PrayerTrackerRepository
 import com.marsholat.domain.repository.SettingsRepository
 
 class MarSholatApplication : Application() {
@@ -22,6 +24,9 @@ class MarSholatApplication : Application() {
     lateinit var prayerScheduleRepository: PrayerScheduleRepository
         private set
 
+    lateinit var prayerTrackerRepository: PrayerTrackerRepository
+        private set
+
     override fun onCreate() {
         super.onCreate()
         instance = this
@@ -30,6 +35,7 @@ class MarSholatApplication : Application() {
         preferencesManager = AppPreferencesManager(this)
         settingsRepository = SettingsRepositoryImpl(preferencesManager)
         prayerScheduleRepository = PrayerScheduleRepositoryImpl()
+        prayerTrackerRepository = PrayerTrackerRepositoryImpl(database.prayerRecordDao())
     }
 
     companion object {
